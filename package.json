@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "nodemon index",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -19,6 +20,7 @@
     "mobx": "^6.6.0",
     "mobx-react": "^7.5.0",
     "mobx-react-lite": "^3.4.0",
+    "nodemon": "^2.0.18",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "pg": "^8.7.3"

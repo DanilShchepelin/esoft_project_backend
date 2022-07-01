@@ -1,8 +1,11 @@
-// const {Router} = require('express');
-// const passport = require('passport');
+const {Router} = require('express');
+const { getUser, addUser, logoutUser, currentUser } = require('../controllers/auth');
 
-// const router = Router();
+const router = Router();
 
-// router.post('/', passport.authenticate('local', {successRedirect: 'http://localhost:3000/profile'}));
+router.post('/auth', getUser);
+router.post('/registration', addUser);
+router.post('/logout', logoutUser);
+router.get('/currentUser', currentUser);
 
-// module.exports = router;
+module.exports = router;

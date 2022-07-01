@@ -4,7 +4,6 @@ const express = require('express');
 const session = require('express-session');
 const api = require('./routers');
 const cors = require('cors');
-const passport = require('passport');
 
 const app = express();
 
@@ -15,7 +14,7 @@ app.set('view engine', 'ejs');
 
 // Возможность получать реквесты с фронта
 app.use(cors({
-    origin: 'http://localhost:3000',
+    origin: 'http://localhost:9000',
     methods: ['POST', 'PUT', 'GET'],
     credentials: true
 }));
@@ -41,26 +40,19 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
     store: PgStore,
+    unset: 'destroy',
     cookie: {
         maxAge: 1000 * 60 * 60 * 24
     }
 }));
 
-app.use(passport.initialize());
-app.use(passport.session());
-
-require('./configs/passport');
-
 app.use('/api', api);
-app.get('/login', (req, res) => {
-    res.render('login');
-});
-app.post('/login', passport.authenticate('local', {successRedirect: '/api/users'}));
+// app.get('/login', (req, res) => {
+//     res.render('login');
+// });
 
 app.get('/', (req, res) => {
     res.sendStatus(200);
 })
 
-// app.post('/login', passport.authenticate('local', {successRedirect: 'http://localhost:3000/profile'}))
-
-app.listen(8080);
+app.listen(8081);

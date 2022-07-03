@@ -43,7 +43,8 @@ module.exports = {
         // return res.json({user: req.session.user});
         if (req.sessionID && req.session.user) {
             res.status(200);
-            return res.json(req.sessionID);
+            const sessionID = req.sessionID;
+            return res.json({sessionID, sessionID});
             // return req.sessionID;
         }
         return res.sendStatus(400);
@@ -90,8 +91,8 @@ module.exports = {
     currentUser: async (req, res) => {
         if (req.sessionID && req.session.user) {
             res.status(200);
-            // return res.json({user: req.session.user})
-            return req.sessionID;
+            return res.json({user: req.session.user.id})
+            // return req.session.user;
         }
         return res.sendStatus(400);
     }

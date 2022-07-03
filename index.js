@@ -15,7 +15,7 @@ app.set('view engine', 'ejs');
 // Возможность получать реквесты с фронта
 app.use(cors({
     origin: 'http://localhost:9000',
-    methods: ['POST', 'PUT', 'GET'],
+    methods: ['POST', 'PUT', 'GET', 'DELETE'],
     credentials: true
 }));
 

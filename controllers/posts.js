@@ -1,5 +1,6 @@
 const knex = require('knex');
 const config = require('../configs');
+const session = require('express-session');
 
 module.exports = {
     getPosts: async (req, res) => {
@@ -21,6 +22,25 @@ module.exports = {
         
         res.json(posts);
     },
+    getPost: async(req, res) => {
+        const db = knex(config.development.database);
+        const userId = req.session.user.id;
+
+        const post = await db
+            .select({
+                id: 'posts.id',
+                name: 'users.name',
+                lastName: 'users.last_name',
+                text: 'posts.text',
+                createdAt: 'posts.created_at',
+            })
+            .from({posts: 'posts'})
+            .leftJoin({users: 'users'}, {'posts.user_id': 'users.id'})
+            .orderBy('createdAt', 'desc')
+            .where({'posts.user_id': userId});
+
+        res.json({post: post});
+    },
     deletePost: async(req, res) => {
         const db = knex(config.development.database);
         const {postID} = req.params;
@@ -37,7 +57,8 @@ module.exports = {
     },
     createPost: async(req, res) => {
         const db = knex(config.development.database);
-        const {text, userId} = req.body;
+        const userId = req.session.user.id;
+        const {text} = req.body;
 
         if (text.length == 0){
             res.sendStatus(400);
@@ -53,6 +74,6 @@ module.exports = {
             })
             .into('posts');
 
-        res.sendStatus(200);
+        res.json(text);
     }
 }

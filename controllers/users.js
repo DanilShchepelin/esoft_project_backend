@@ -25,10 +25,10 @@ module.exports = {
     },
     getUser: async(req, res) => {
         const db = knex(config.development.database);
-        const userId = req.session.user.id;
+        const userId= req.session.user.id;
 
         const user = await db
-            .select({
+            .first({
                 id: 'id',
                 name: 'name',
                 lastName: 'last_name',
@@ -37,6 +37,6 @@ module.exports = {
             .from('users')
             .where({id: userId});
 
-        res.json(user);
+        res.json({user, user});
     }
 }

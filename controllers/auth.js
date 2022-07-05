@@ -45,7 +45,6 @@ module.exports = {
             res.status(200);
             const sessionID = req.sessionID;
             return res.json({sessionID, sessionID});
-            // return req.sessionID;
         }
         return res.sendStatus(400);
     },

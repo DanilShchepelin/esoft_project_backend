@@ -21,7 +21,7 @@ module.exports = {
             .leftJoin({usersData : 'users_data'}, {'users.id': 'usersData.user_id'})
             .orderBy('id');
 
-        res.json(users);
+        res.json({users: users});
     },
     getUser: async(req, res) => {
         const db = knex(config.development.database);

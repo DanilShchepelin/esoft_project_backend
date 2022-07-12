@@ -6,32 +6,102 @@ module.exports = {
     getDialogs: async(req, res) => {
         const db = knex(config.development.database);
         const userId = req.session.user.id;
-        const userTwoId = req.param;
 
         const dialogs = await db
             .select({
                 id: 'chats.id',
-                name: 'chats.name'
+                userTwoName: 'user2.name',
+                userTwoId: 'user2.id'
             })
             .from({chats: 'chats'})
-            .leftJoin({groups: 'groups'}, {'chats.id': 'groups.chat_id'})
-            .where({'groups.user_id': userTwoId});
+            .join({user2: 'users'}, function() {
+                this
+                    .on('user2.id', '=', 'chats.user_one')
+                    .andOn('chats.user_one', '!=', userId)
+                    .orOn('user2.id', '=', 'chats.user_two')
+                    .andOn('chats.user_two', '!=', userId)
+                    
+            })
+            .where({'chats.user_one': userId},)
+            .orWhere({'chats.user_two': userId});
 
-        res.json(dialogs);
+        res.json({dialogs: dialogs});
     },
     getMessages: async(req, res) => {
         const db = knex(config.development.database);
         const userId = req.session.user.id;
+        const {userTwoId} = req.params;
+
+        const [{chatId}] = await db
+            .select({
+                chatId: 'id'
+            })
+            .from('chats')
+            .where({
+                'user_one': userId,
+                'user_two': userTwoId
+            })
+            .orWhere({
+                'user_one': userTwoId,
+                'user_two': userId
+            });
 
         const messages = await db
             .select({
-                id: 'id',
-                userId: 'user_id',
-                text: 'text',
-                createdAt: 'created_at',
-                status: 'status',
-                chatId: 'chat_id'
+                id: 'messages.id',
+                text: 'messages.text',
+                userName: 'users.name',
+                createdAt: 'messages.created_at',
+                status: 'messages.status',
             })
-            .from('messages')
-     }
+            .from({messages: 'messages'})
+            .leftJoin({users: 'users'}, {'users.id': 'messages.user_id'})
+            .where({'messages.chat_id': chatId});
+
+        res.json({messages: messages});
+    },
+    createChat: async(req, res) => {
+        const db = knex(config.development.database);
+        const userId = req.session.user.id;
+        const {userTwoId} = req.params;
+
+        await db
+            .insert({
+                userId,
+                userTwoId
+            })
+            .into('chats');
+
+        res.sendStatus(200);
+    },
+    addMessage: async(req, res) => {
+        const db = knex(config.development.database);
+        const userId = req.session.user.id;
+        const {text} = req.body;
+        const {userTwoId} = req.params;
+
+        const [{chatId}] = await db
+            .select({
+                chatId: 'id'
+            })
+            .from('chats')
+            .where({
+                'user_one': userId,
+                'user_two': userTwoId
+            })
+            .orWhere({
+                'user_one': userTwoId,
+                'user_two': userId
+            });
+        
+        await db
+            .insert({
+                user_id: userId,
+                text,
+                chat_id: chatId
+            })
+            .into('messages');
+
+        res.sendStatus(200);
+    }
 }

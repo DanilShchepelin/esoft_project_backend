@@ -9,14 +9,17 @@ exports.up = async(knex) => {
             .primary()
             .comment('Идентификатор');
         table
-            .integer('user_id')
+            .integer('user_one')
             .notNullable()
             .references('id')
             .inTable('users')
             .comment('Идентификатор пользователя создавшего чат');
         table
-            .string('name', 64)
-            .comment('Название чата');
+            .integer('user_two')
+            .notNullable()
+            .references('id')
+            .inTable('users')
+            .comment('Идентификатор пользователя создавшего чат');
         table.comment('Чаты');
     });
     await knex.schema.createTable('messages', (table) => {
@@ -52,21 +55,6 @@ exports.up = async(knex) => {
             .comment('Идентификатор чата');
         table.comment('Сообщения');
     });
-    await knex.schema.createTable('groups', (table) => {
-        table
-            .integer('chat_id')
-            .notNullable()
-            .references('id')
-            .inTable('chats')
-            .comment('Идентификатор чата');
-        table
-            .integer('user_id')
-            .notNullable()
-            .references('id')
-            .inTable('users')
-            .comment('Идентификатор пользователя');
-        table.comment('Группы');
-    });
 };
 
 /**
@@ -76,5 +64,4 @@ exports.up = async(knex) => {
 exports.down = async(knex) => {
     await knex.schema.dropTable('messages');
     await knex.schema.dropTable('chats');
-    await knex.schema.dropTable('groups');
 };

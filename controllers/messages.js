@@ -27,6 +27,31 @@ module.exports = {
 
         res.json({dialogs: dialogs});
     },
+    getDialog: async(req, res) => {
+        const db = knex(config.development.database);
+        const userId = req.session.user.id;
+        const {userTwoId} = req.params;
+
+        const dialog = await db
+            .first({
+                id: 'chats.id'
+                // userOne: 'user_one',
+                // userTwo: 'user_two'
+            })
+            .from('chats')
+            .where(function(){
+                this
+                    .where('user_one', '=', userId)
+                    .andWhere('user_two', '=', userTwoId)
+            })
+            .orWhere(function() {
+                this
+                    .where('user_one', '=', userTwoId)
+                    .andWhere('user_two', '=', userId)
+            });
+
+        res.json({dialog: dialog});
+    },
     getMessages: async(req, res) => {
         const db = knex(config.development.database);
         const userId = req.session.user.id;
@@ -67,8 +92,8 @@ module.exports = {
 
         await db
             .insert({
-                userId,
-                userTwoId
+                'user_one': userId,
+                'user_two': userTwoId
             })
             .into('chats');
 
@@ -86,11 +111,15 @@ module.exports = {
             })
             .from('chats')
             .where({
-                'user_one': userId,
+                'user_one': userId
+            })
+            .andWhere({
                 'user_two': userTwoId
             })
             .orWhere({
-                'user_one': userTwoId,
+                'user_one': userTwoId
+            })
+            .andWhere({
                 'user_two': userId
             });
         

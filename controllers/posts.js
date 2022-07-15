@@ -18,9 +18,9 @@ module.exports = {
             .from({posts: 'posts'})
             .leftJoin({users: 'users'}, {'posts.user_id': 'users.id'})
             .orderBy('createdAt', 'desc')
-            .where({status: 'active'});
+            .where({'posts.status': 'active'});
         
-        res.json(posts);
+        res.json({posts: posts});
     },
     getPost: async(req, res) => {
         const db = knex(config.development.database);
@@ -37,7 +37,8 @@ module.exports = {
             .from({posts: 'posts'})
             .leftJoin({users: 'users'}, {'posts.user_id': 'users.id'})
             .orderBy('createdAt', 'desc')
-            .where({'posts.user_id': userId});
+            .where({'posts.user_id': userId})
+            .andWhere({'posts.status': 'active'});
 
         res.json({post: post});
     },
